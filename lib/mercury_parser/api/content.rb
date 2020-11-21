@@ -16,6 +16,21 @@ module MercuryParser
 
         MercuryParser::Article.new(response)
       end
+
+      # Parse HTML and return its main content
+      # Returns a MercuryParser::Article object
+      #
+      # Pass the html string as `html` => "html_string" in `options`
+      # You can also pass a `max_pages` integer to set the maximum number of pages to parse and combine. Default is 25.
+      #
+      # @param url [String] The URL of an article to return the content for
+      # @return [MercuryParser::Article]
+      def parse_html(url, options = {})
+        params = { url: url }
+        response = post('', params.merge(options))
+
+        MercuryParser::Article.new(response)
+      end
     end # Content
   end # API
 end

@@ -8,6 +8,10 @@ module MercuryParser
       request(:get, path, params)
     end
 
+    # Performs a HTTP POST request
+    def post(path, params={})
+      request(:post, path, params)
+    end
 
     private
 
@@ -18,11 +22,16 @@ module MercuryParser
       raise MercuryParser::Error::ConfigurationError.new("Please configure MercuryParser.api_key first") if api_key.nil?
 
       connection_options = {}
+      connection_options[:url] = method == :get ? MercuryParser.api_endpoint : MercuryParser.api_html_endpoint
+
       begin
         response = connection(connection_options).send(method) do |req|
-          req.url(path, params)
+          req.url(path, params.except(:html))
           req.headers['Content-Type'] = 'application/json'
           req.headers['x-api-key'] = api_key
+          unless method == :get && params.empty?
+            req.body = JSON.dump(params)
+          end
         end
       rescue Faraday::Error::ClientError => error
         if error.is_a?(Faraday::Error::ClientError)
